@@ -1,83 +1,110 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="text-center py-10 mb-8 relative">
-    <div class="flex justify-center items-center gap-4 mb-4">
-        <img src="{{ url_for('static', filename='logo.png') }}" class="w-16 h-16 object-contain floating-logo bg-transparent" alt="Logo">
-        <h1 class="text-4xl md:text-6xl font-black tracking-wider bg-gradient-to-r from-slate-900 via-blue-600 to-indigo-600 bg-clip-text text-transparent">Chanoq.uz</h1>
-    </div>
-    <p class="text-slate-600 max-w-xl mx-auto text-base">Uy-joy, kvartira, mashina, bo'sh ish o'rinlari va boshqa har qanday turdagi eng sara e'lonlar makoni.</p>
-</div>
-
-<!-- Search & Filters -->
-<form method="GET" action="/" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-lg mb-10 grid grid-cols-1 md:grid-cols-4 gap-4">
-    <input type="text" name="search" value="{{ search }}" placeholder="Qidiruv (masalan: Spark, Toshkent...)" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+<div class="flex flex-col items-center justify-center text-center py-10">
     
-    <select name="category" onchange="this.form.submit()" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
-        <option value="">Barcha kategoriyalar</option>
-        {% for cat in categories.keys() %}
-            <option value="{{ cat }}" {% if selected_cat == cat %}selected{% endif %}>{{ cat }}</option>
-        {% endfor %}
-    </select>
+    <!-- Dumaloq logotip va 360 darajada tarqaluvchi sharikchalar effekti -->
+    <div class="relative flex items-center justify-center mb-6">
+        <!-- Zarrachalar (sharikchalar) -->
+        <div class="absolute w-36 h-36 pointer-events-none">
+            <span class="particle bg-blue-500" style="--x: -50px; --y: -50px;"></span>
+            <span class="particle bg-sky-400" style="--x: 50px; --y: -60px;"></span>
+            <span class="particle bg-indigo-600" style="--x: -70px; --y: 20px;"></span>
+            <span class="particle bg-blue-600" style="--x: 70px; --y: 30px;"></span>
+            <span class="particle bg-sky-500" style="--x: -30px; --y: 70px;"></span>
+            <span class="particle bg-blue-400" style="--x: 40px; --y: 60px;"></span>
+        </div>
 
-    <select name="subcategory" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
-        <option value="">Barcha kichik bo'limlar</option>
-        {% for sub in subcategories %}
-            <option value="{{ sub }}" {% if selected_subcat == sub %}selected{% endif %}>{{ sub }}</option>
-        {% endfor %}
-    </select>
-
-    <select name="region" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
-        <option value="">Barcha viloyatlar</option>
-        <option value="Toshkent sh." {% if region == 'Toshkent sh.' %}selected{% endif %}>Toshkent sh.</option>
-        <option value="Toshkent vil." {% if region == 'Toshkent vil.' %}selected{% endif %}>Toshkent vil.</option>
-        <option value="Samarqand" {% if region == 'Samarqand' %}selected{% endif %}>Samarqand</option>
-        <option value="Buxoro" {% if region == 'Buxoro' %}selected{% endif %}>Buxoro</option>
-        <option value="Farg'ona" {% if region == "Farg'ona" %}selected{% endif %}>Farg'ona</option>
-        <option value="Andijon" {% if region == 'Andijon' %}selected{% endif %}>Andijon</option>
-        <option value="Namangan" {% if region == 'Namangan' %}selected{% endif %}>Namangan</option>
-        <option value="Qashqadaryo" {% if region == 'Qashqadaryo' %}selected{% endif %}>Qashqadaryo</option>
-        <option value="Surxondaryo" {% if region == 'Surxondaryo' %}selected{% endif %}>Surxondaryo</option>
-        <option value="Jizzax" {% if region == 'Jizzax' %}selected{% endif %}>Jizzax</option>
-        <option value="Sirdaryo" {% if region == 'Sirdaryo' %}selected{% endif %}>Sirdaryo</option>
-        <option value="Navoiy" {% if region == 'Navoiy' %}selected{% endif %}>Navoiy</option>
-        <option value="Xorazm" {% if region == 'Xorazm' %}selected{% endif %}>Xorazm</option>
-        <option value="Qoraqalpog'iston" {% if region == "Qoraqalpog'iston" %}selected{% endif %}>Qoraqalpog'iston</option>
-    </select>
-
-    <div class="col-span-full flex gap-4">
-        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl py-2.5 transition shadow-md">Filtrlash va qidirish</button>
-        <a href="/" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition text-center flex items-center justify-center">Tozalash</a>
+        <!-- Dumaloq logotip -->
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-full shadow-lg floating-logo border-2 border-blue-500/30 relative z-10">
     </div>
-</form>
 
-<!-- Ads Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for ad in ads %}
-        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-md flex flex-col justify-between hover:shadow-xl transition">
-            <div>
-                <img src="{{ url_for('static', filename='uploads/' + ad['image']) }}" alt="Ad Image" class="w-full h-48 object-cover">
-                <div class="p-5">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium border border-blue-100">{{ ad['category'] }} / {{ ad['subcategory'] }}</span>
-                        <span class="text-xs text-slate-500">{{ ad['region'] }}</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-900 mb-2">{{ ad['title'] }}</h3>
-                    <p class="text-blue-600 font-extrabold text-xl mb-1">{{ ad['price'] }} so'm</p>
-                    {% if ad['salary'] %}
-                        <p class="text-emerald-600 font-semibold text-sm mb-2">Oylik maosh: {{ ad['salary'] }}</p>
-                    {% endif %}
-                    <p class="text-slate-600 text-sm mb-4 line-clamp-2">{{ ad['details'] }}</p>
-                </div>
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
+        <span class="bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 bg-clip-text text-transparent">Chanoq.uz</span>
+    </h1>
+    <p class="text-slate-600 text-base sm:text-lg max-w-xl mb-8 leading-relaxed">
+        Uy-joy, kvartira, mashina, bo'sh ish o'rinlari va boshqa har qanday turdagi eng sara e'lonlar makoni.
+    </p>
+
+    <!-- Qidiruv va Filtr qismi -->
+    <form method="GET" action="/" class="w-full max-w-4xl bg-slate-50 border border-slate-200 p-4 rounded-2xl shadow-sm flex flex-col md:flex-row gap-3 mb-10">
+        <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="Qidiruv (masalan: 3 xonali uy...)" class="flex-grow bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-blue-600 text-sm">
+        
+        <select name="category" class="bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-blue-600 text-sm">
+            <option value="">Barcha kategoriyalar</option>
+            {% for cat in categories.keys() %}
+                <option value="{{ cat }}" {% if request.args.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="region" class="bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-blue-600 text-sm">
+            <option value="">Barcha viloyatlar</option>
+            {% set regions = ["Toshkent sh.", "Toshkent vil.", "Samarqand", "Buxoro", "Farg'ona", "Andijon", "Namangan", "Qashqadaryo", "Surxondaryo", "Jizzax", "Sirdaryo", "Navoiy", "Xorazm", "Qoraqalpog'iston"] %}
+            {% for reg in regions %}
+                <option value="{{ reg }}" {% if request.args.get('region') == reg %}selected{% endif %}>{{ reg }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl shadow transition text-sm">Qidirish</button>
+    </form>
+
+    <!-- E'lonlar ro'yxati -->
+    <div class="w-full max-w-7xl">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6 text-left">Oxirgi e'lonlar</h2>
+        
+        {% if ads %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for ad in ads %}
+                    <a href="{{ url_for('ad_detail', ad_id=ad['id']) }}" class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col text-left group">
+                        <div class="h-48 overflow-hidden bg-slate-100 relative">
+                            <img src="{{ url_for('static', filename='uploads/' + ad['image']) }}" alt="Ad" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-full font-medium">{{ ad['region'] }}</span>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow justify-between">
+                            <div>
+                                <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{{ ad['category'] }}</span>
+                                <h3 class="font-bold text-slate-900 text-base mt-2 line-clamp-1 group-hover:text-blue-600 transition">{{ ad['title'] }}</h3>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                <span class="text-lg font-black text-blue-600">{{ ad['price'] }} so'm</span>
+                                <span class="text-xs text-slate-400">Ko'rish</span>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
             </div>
-            <div class="p-5 pt-0 border-t border-slate-100 mt-auto flex items-center justify-between text-sm">
-                <span class="text-slate-500">Tel: <strong class="text-slate-800">{{ ad['phone'] }}</strong></span>
-                <a href="{{ url_for('ad_detail', id=ad['id']) }}" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-medium transition shadow-sm">Batafsil ko'rish</a>
+        {% else %}
+            <div class="text-center py-16 bg-slate-50 border border-slate-200 rounded-2xl">
+                <p class="text-slate-500 text-base">Hozircha e'lonlar mavjud emas.</p>
             </div>
-        </div>
-    {% else %}
-        <div class="col-span-full text-center py-16 text-slate-400">
-            Hozircha tasdiqlangan e'lonlar mavjud emas.
-        </div>
-    {% endfor %}
+        {% endif %}
+    </div>
 </div>
+
+<style>
+    /* 360 darajada har tomonga tarqalib g'oyib bo'luvchi sharikchalar animatsiyasi */
+    @keyframes burstParticles {
+        0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+        }
+        100% {
+            transform: translate(var(--x), var(--y)) scale(0.2);
+            opacity: 0;
+        }
+    }
+    .particle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: burstParticles 2s infinite ease-out;
+    }
+    .particle:nth-child(2) { animation-delay: 0.3s; }
+    .particle:nth-child(3) { animation-delay: 0.6s; }
+    .particle:nth-child(4) { animation-delay: 0.9s; }
+    .particle:nth-child(5) { animation-delay: 1.2s; }
+    .particle:nth-child(6) { animation-delay: 1.5s; }
+</style>
 {% endblock %}
