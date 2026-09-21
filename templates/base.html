@@ -8,36 +8,36 @@
     <style>
         @keyframes floatLogo {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
+            50% { transform: translateY(-6px) rotate(1.5deg); }
         }
         .floating-logo {
             animation: floatLogo 3s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-500 selection:text-white">
+<body class="bg-white text-slate-900 min-h-screen flex flex-col font-sans">
 
     <!-- Header / Nav -->
-    <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+    <header class="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="/" class="flex items-center gap-3 group">
-                <img src="{{ url_for('static', filename='logo.png') }}" class="w-10 h-10 object-contain floating-logo" alt="Logo">
-                <span class="text-2xl font-extrabold tracking-wide bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-500 bg-clip-text text-transparent">Chanoq.uz</span>
+                <img src="{{ url_for('static', filename='logo.png') }}" class="w-10 h-10 object-contain floating-logo bg-transparent" alt="Logo">
+                <span class="text-2xl font-extrabold tracking-wide bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 bg-clip-text text-transparent">Chanoq.uz</span>
             </a>
             
             <div class="flex items-center gap-4">
-                <a href="{{ url_for('add_ad') }}" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold px-4 py-2 rounded-xl shadow-lg shadow-blue-500/20 transition transform active:scale-95">
+                <a href="{{ url_for('add_ad') }}" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md transition transform active:scale-95 text-sm">
                     + E’lon joylash
                 </a>
                 {% if session.get('user_id') %}
-                    <a href="{{ url_for('my_ads') }}" class="text-sm font-medium hover:text-blue-400 transition">Shaxsiy kabinet</a>
-                    <a href="{{ url_for('logout') }}" class="text-sm text-red-400 hover:text-red-300 transition">Chiqish</a>
+                    <a href="{{ url_for('my_ads') }}" class="text-sm font-medium hover:text-blue-600 transition">Shaxsiy kabinet</a>
+                    <a href="{{ url_for('logout') }}" class="text-sm text-rose-600 hover:text-rose-700 transition">Chiqish</a>
                 {% elif session.get('admin') %}
-                    <a href="{{ url_for('admin_panel') }}" class="text-sm text-yellow-400 hover:text-yellow-300">Admin Panel</a>
-                    <a href="{{ url_for('logout') }}" class="text-sm text-red-400">Chiqish</a>
+                    <a href="{{ url_for('admin_panel') }}" class="text-sm text-amber-600 font-bold">Admin Panel</a>
+                    <a href="{{ url_for('logout') }}" class="text-sm text-rose-600">Chiqish</a>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="text-sm font-medium hover:text-blue-400 transition">Kirish</a>
-                    <a href="{{ url_for('register') }}" class="text-sm bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition">Ro'yxatdan o'tish</a>
+                    <a href="{{ url_for('login') }}" class="text-sm font-medium hover:text-blue-600 transition">Kirish</a>
+                    <a href="{{ url_for('register') }}" class="text-sm bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 transition">Ro'yxatdan o'tish</a>
                 {% endif %}
             </div>
         </div>
@@ -48,7 +48,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="mb-6 p-4 rounded-xl border {% if category == 'success' %}bg-emerald-950/40 border-emerald-800 text-emerald-300{% elif category == 'danger' %}bg-rose-950/40 border-rose-800 text-rose-300{% else %}bg-blue-950/40 border-blue-800 text-blue-300{% endif %}">
+                    <div class="mb-6 p-4 rounded-xl border {% if category == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800{% elif category == 'danger' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -59,18 +59,17 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800 bg-slate-900/80 py-8 mt-12 text-slate-400 text-sm">
+    <footer class="border-t border-slate-200 bg-slate-50 py-8 mt-12 text-slate-600 text-sm">
         <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="flex items-center gap-3">
-                <img src="{{ url_for('static', filename='logo.png') }}" class="w-8 h-8 object-contain floating-logo" alt="Logo">
-                <span class="font-bold text-slate-200">www.chanoq.uz</span> &copy; 2026. Barcha huquqlar himoyalangan.
+                <img src="{{ url_for('static', filename='logo.png') }}" class="w-8 h-8 object-contain floating-logo bg-transparent" alt="Logo">
+                <span class="font-bold text-slate-800">www.chanoq.uz</span> &copy; 2026. Barcha huquqlar himoyalangan.
             </div>
             
             <div class="flex flex-wrap items-center justify-center gap-4">
-                <a href="https://t.me/Chanoq_uzz" target="_blank" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-200 transition">Telegram - @Chanoq_uzz</a>
-                <a href="https://t.me/ChanoqUz_Bot" target="_blank" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-200 transition">Telegram Bot - @ChanoqUz_Bot</a>
-                <a href="https://instagram.com/Chanoq_uz" target="_blank" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-200 transition">Instagram - @Chanoq_uz</a>
-                <a href="https://t.me/mekhanizatsiya" target="_blank" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-3 py-1.5 rounded-lg border border-blue-500/30 transition">&lt;/&gt; Dasturchi</a>
+                <a href="https://t.me/Chanoq_uzz" target="_blank" class="hover:text-blue-600 font-medium transition">Telegram - @Chanoq_uzz</a>
+                <a href="https://t.me/ChanoqUz_Bot" target="_blank" class="hover:text-blue-600 font-medium transition">Telegram Bot - @ChanoqUz_Bot</a>
+                <a href="https://instagram.com/Chanoq_uz" target="_blank" class="hover:text-pink-600 font-medium transition">Instagram - @Chanoq_uz</a>
             </div>
         </div>
     </footer>
