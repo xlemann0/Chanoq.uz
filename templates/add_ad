@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-xl mt-6">
+    <h2 class="text-2xl font-bold text-white mb-2">Yangi E'lon Qo'shish</h2>
+    <div class="bg-blue-950/40 border border-blue-900/50 p-4 rounded-xl mb-6 text-blue-200 text-sm">
+        <p class="font-bold mb-1">E'lon joylash narxi: 20 000 so'm</p>
+        <p>Quyidagi kartaga to'lovni amalga oshiring va chek rasmini yuklang:</p>
+        <p class="font-mono bg-slate-950 px-3 py-1.5 rounded-lg mt-2 text-sky-300 font-bold select-all">9860 1701 0945 5106 (Raxmatillayev Dilshod)</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+        <div>
+            <label class="block text-sm text-slate-400 mb-1">E'lon sarlavhasi (Masalan: Spark 2020 sotiladi / 3 xonali kvartira)</label>
+            <input type="text" name="title" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Bo'limni tanlang</label>
+                <select name="category" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+                    <option value="Mashina">Mashina</option>
+                    <option value="Uy-joy / Kvartira">Uy-joy / Kvartira</option>
+                    <option value="Bo'sh ish o'rni">Bo'sh ish o'rni</option>
+                    <option value="Boshqa">Boshqa</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Hududni tanlang</label>
+                <select name="region" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+                    <option value="Toshkent sh.">Toshkent sh.</option>
+                    <option value="Toshkent vil.">Toshkent vil.</option>
+                    <option value="Samarqand">Samarqand</option>
+                    <option value="Buxoro">Buxoro</option>
+                    <option value="Farg'ona">Farg'ona</option>
+                    <option value="Andijon">Andijon</option>
+                    <option value="Namangan">Namangan</option>
+                    <option value="Qashqadaryo">Qashqadaryo</option>
+                    <option value="Surxondaryo">Surxondaryo</option>
+                    <option value="Jizzax">Jizzax</option>
+                    <option value="Sirdaryo">Sirdaryo</option>
+                    <option value="Navoiy">Navoiy</option>
+                    <option value="Xorazm">Xorazm</option>
+                    <option value="Qoraqalpog'iston">Qoraqalpog'iston</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm text-slate-400 mb-1">Narxi (so'mda)</label>
+            <input type="text" name="price" placeholder="Masalan: 85000000" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div>
+            <label class="block text-sm text-slate-400 mb-1">Batafsil ma'lumot (Model, rang, yil, holat va hokazo)</label>
+            <textarea name="details" rows="4" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Aloqa raqami</label>
+                <input type="text" name="phone" placeholder="+998901234567" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Telegram username</label>
+                <input type="text" name="telegram" placeholder="@username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">E'lon rasmini yuklang</label>
+                <input type="file" name="image" accept="image/*" required class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">To'lov cheki rasmini yuklang (20,000 so'm)</label>
+                <input type="file" name="receipt" accept="image/*" required class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+            </div>
+        </div>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg transition mt-4">E'lonni yuborish</button>
+    </form>
+</div>
+{% endblock %}
