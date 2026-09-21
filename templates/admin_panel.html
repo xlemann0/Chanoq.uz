@@ -1,62 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="mb-8">
-    <h2 class="text-3xl font-black text-white mb-2">Admin Panel</h2>
-    <p class="text-slate-400">Barcha kelib tushgan e'lonlar va ro'yxatdan o'tgan foydalanuvchilarni boshqarish paneli.</p>
+    <h2 class="text-3xl font-black text-slate-900 mb-2">Admin Panel</h2>
+    <p class="text-slate-600">Barcha kelib tushgan e'lonlar va ro'yxatdan o'tgan foydalanuvchilarni boshqarish paneli.</p>
 </div>
 
 <div class="space-y-10">
     <!-- Ads Management -->
     <div>
-        <h3 class="text-xl font-bold text-white mb-4">Kelib tushgan e'lonlar</h3>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-x-auto shadow-xl">
+        <h3 class="text-xl font-bold text-slate-900 mb-4">Kelib tushgan e'lonlar</h3>
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-x-auto shadow-xl">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-slate-800 bg-slate-950/50 text-slate-400 text-sm">
+                    <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 text-sm">
                         <th class="p-4">Rasm & Chek</th>
                         <th class="p-4">Sarlavha</th>
-                        <th class="p-4">Bo'lim / Hudud</th>
-                        <th class="p-4">Narx & Aloqa</th>
+                        <th class="p-4">Kategoriya</th>
+                        <th class="p-4">Narx & Maosh</th>
                         <th class="p-4">Holati</th>
                         <th class="p-4">Amallar</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800 text-sm">
+                <tbody class="divide-y divide-slate-100 text-sm">
                     {% for ad in ads %}
-                        <tr class="hover:bg-slate-800/40 transition">
+                        <tr class="hover:bg-slate-50 transition">
                             <td class="p-4 flex items-center gap-2">
                                 <a href="{{ url_for('static', filename='uploads/' + ad['image']) }}" target="_blank" class="block">
-                                    <img src="{{ url_for('static', filename='uploads/' + ad['image']) }}" class="w-12 h-12 rounded-lg object-cover border border-slate-700" title="E'lon rasmi">
+                                    <img src="{{ url_for('static', filename='uploads/' + ad['image']) }}" class="w-12 h-12 rounded-lg object-cover border border-slate-200" title="E'lon rasmi">
                                 </a>
                                 <a href="{{ url_for('static', filename='uploads/' + ad['receipt']) }}" target="_blank" class="block">
-                                    <img src="{{ url_for('static', filename='uploads/' + ad['receipt']) }}" class="w-12 h-12 rounded-lg object-cover border border-indigo-500/50" title="Chek rasmi">
+                                    <img src="{{ url_for('static', filename='uploads/' + ad['receipt']) }}" class="w-12 h-12 rounded-lg object-cover border border-blue-200" title="Chek rasmi">
                                 </a>
                             </td>
-                            <td class="p-4 font-semibold text-white">
+                            <td class="p-4 font-semibold text-slate-900">
                                 {{ ad['title'] }}
-                                <div class="text-xs text-slate-400 font-normal mt-1 line-clamp-1">{{ ad['details'] }}</div>
+                                <div class="text-xs text-slate-500 font-normal mt-1 line-clamp-1">{{ ad['details'] }}</div>
                             </td>
-                            <td class="p-4 text-slate-300">
-                                {{ ad['category'] }}
-                                <div class="text-xs text-slate-500">{{ ad['region'] }}</div>
-                            </td>
-                            <td class="p-4">
-                                <div class="font-bold text-blue-400">{{ ad['price'] }} so'm</div>
-                                <div class="text-xs text-slate-400">{{ ad['phone'] }} | @{{ ad['telegram'] }}</div>
+                            <td class="p-4 text-slate-700">
+                                {{ ad['category'] }} / {{ ad['subcategory'] }}
+                                <div class="text-xs text-slate-400">{{ ad['region'] }}</div>
                             </td>
                             <td class="p-4">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold {% if ad['status'] == 'Tasdiqlangan' %}bg-emerald-950 text-emerald-400 border border-emerald-800{% elif ad['status'] == 'Rad etilgan' %}bg-rose-950 text-rose-400 border border-rose-800{% else %}bg-amber-950 text-amber-400 border border-amber-800{% endif %}">
+                                <div class="font-bold text-blue-600">{{ ad['price'] }} so'm</div>
+                                {% if ad['salary'] %}<div class="text-xs text-emerald-600">Oylik: {{ ad['salary'] }}</div>{% endif %}
+                                <div class="text-xs text-slate-500">{{ ad['phone'] }} | {{ ad['telegram'] }}</div>
+                            </td>
+                            <td class="p-4">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold {% if ad['status'] == 'Tasdiqlangan' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif ad['status'] == 'Rad etilgan' %}bg-rose-50 text-rose-700 border border-rose-200{% else %}bg-amber-50 text-amber-700 border border-amber-200{% endif %}">
                                     {{ ad['status'] }}
                                 </span>
                             </td>
                             <td class="p-4 flex items-center gap-2">
-                                <a href="{{ url_for('admin_approve', id=ad['id']) }}" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/30 transition">Tasdiqlash</a>
-                                <a href="{{ url_for('admin_reject', id=ad['id']) }}" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/30 transition">Rad etish</a>
+                                <a href="{{ url_for('admin_approve', id=ad['id']) }}" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 transition font-medium">Tasdiqlash</a>
+                                <a href="{{ url_for('admin_reject', id=ad['id']) }}" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg border border-rose-200 transition font-medium">Rad etish</a>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="p-6 text-center text-slate-500">Hozircha e'lonlar yo'q.</td>
+                            <td colspan="6" class="p-6 text-center text-slate-400">Hozircha e'lonlar yo'q.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -66,24 +67,24 @@
 
     <!-- Users List -->
     <div>
-        <h3 class="text-xl font-bold text-white mb-4">Ro'yxatdan o'tgan foydalanuvchilar</h3>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <h3 class="text-xl font-bold text-slate-900 mb-4">Ro'yxatdan o'tgan foydalanuvchilar</h3>
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-slate-800 bg-slate-950/50 text-slate-400 text-sm">
+                    <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 text-sm">
                         <th class="p-4">ID</th>
                         <th class="p-4">Foydalanuvchi nomi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800 text-sm">
+                <tbody class="divide-y divide-slate-100 text-sm">
                     {% for user in users %}
-                        <tr class="hover:bg-slate-800/40 transition">
-                            <td class="p-4 text-slate-400">#{{ user['id'] }}</td>
-                            <td class="p-4 font-semibold text-white">{{ user['username'] }}</td>
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-4 text-slate-500">#{{ user['id'] }}</td>
+                            <td class="p-4 font-semibold text-slate-900">{{ user['username'] }}</td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="2" class="p-6 text-center text-slate-500">Foydalanuvchilar yo'q.</td>
+                            <td colspan="2" class="p-6 text-center text-slate-400">Foydalanuvchilar yo'q.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
