@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white border border-slate-200 p-8 rounded-2xl shadow-xl mt-6">
+    <h2 class="text-2xl font-bold text-slate-900 mb-4">E'lonni Tahrirlash</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+        <div>
+            <label class="block text-sm text-slate-600 mb-1">E'lon sarlavhasi</label>
+            <input type="text" name="title" value="{{ ad['title'] }}" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm text-slate-600 mb-1">Kategoriya</label>
+                <select name="category" id="categorySelect" onchange="updateSubcategories()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+                    {% for cat in categories.keys() %}
+                        <option value="{{ cat }}" {% if ad['category'] == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm text-slate-600 mb-1">Kichik bo'lim</label>
+                <select name="subcategory" id="subcategorySelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+                    <option value="{{ ad['subcategory'] }}">{{ ad['subcategory'] }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm text-slate-600 mb-1">Hudud</label>
+                <select name="region" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+                    {% set regions = ["Toshkent sh.", "Toshkent vil.", "Samarqand", "Buxoro", "Farg'ona", "Andijon", "Namangan", "Qashqadaryo", "Surxondaryo", "Jizzax", "Sirdaryo", "Navoiy", "Xorazm", "Qoraqalpog'iston"] %}
+                    {% for reg in regions %}
+                        <option value="{{ reg }}" {% if ad['region'] == reg %}selected{% endif %}>{{ reg }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm text-slate-600 mb-1">Narxi (so'mda)</label>
+                <input type="text" name="price" value="{{ ad['price'] }}" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm text-slate-600 mb-1">Oylik maosh</label>
+            <input type="text" name="salary" value="{{ ad['salary'] }}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+
+        <div>
+            <label class="block text-sm text-slate-600 mb-1">Batafsil ma'lumot</label>
+            <textarea name="details" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">{{ ad['details'] }}</textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm text-slate-600 mb-1">Aloqa raqami</label>
+                <input type="text" name="phone" value="{{ ad['phone'] }}" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+            </div>
+            <div>
+                <label class="block text-sm text-slate-600 mb-1">Telegram username</label>
+                <input type="text" name="telegram" value="{{ ad['telegram'] }}" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm text-slate-600 mb-1">Yangi rasm yuklash (ixtiyoriy)</label>
+            <input type="file" name="image" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500">
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl shadow-lg transition mt-4">O'zgarishlarni saqlash</button>
+    </form>
+</div>
+
+<script>
+    const categoriesData = {{ categories | tojson }};
+    function updateSubcategories() {
+        const catSelect = document.getElementById('categorySelect');
+        const subSelect = document.getElementById('subcategorySelect');
+        const selectedCat = catSelect.value;
+        
+        subSelect.innerHTML = '<option value="">Kichik bo\'limni tanlang</option>';
+        if (selectedCat && categoriesData[selectedCat]) {
+            categoriesData[selectedCat].forEach(sub => {
+                const opt = document.createElement('option');
+                opt.value = sub;
+                opt.textContent = sub;
+                subSelect.appendChild(opt);
+            });
+        }
+    }
+    updateSubcategories();
+</script>
+{% endblock %}
