@@ -1,29 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="text-center py-10 mb-8 relative">
-    <div class="absolute inset-0 flex items-center justify-center opacity-10 blur-3xl pointer-events-none">
-        <div class="w-96 h-96 bg-blue-600 rounded-full"></div>
-    </div>
     <div class="flex justify-center items-center gap-4 mb-4">
-        <img src="{{ url_for('static', filename='logo.png') }}" class="w-16 h-16 object-contain floating-logo" alt="Logo">
-        <h1 class="text-4xl md:text-6xl font-black tracking-wider bg-gradient-to-r from-white via-blue-200 to-blue-500 bg-clip-text text-transparent">Chanoq.uz</h1>
+        <img src="{{ url_for('static', filename='logo.png') }}" class="w-16 h-16 object-contain floating-logo bg-transparent" alt="Logo">
+        <h1 class="text-4xl md:text-6xl font-black tracking-wider bg-gradient-to-r from-slate-900 via-blue-600 to-indigo-600 bg-clip-text text-transparent">Chanoq.uz</h1>
     </div>
-    <p class="text-slate-400 max-w-xl mx-auto text-base">Uy-joy, kvartira, mashina, bo'sh ish o'rinlari va boshqa har qanday turdagi eng sara e'lonlar makoni.</p>
+    <p class="text-slate-600 max-w-xl mx-auto text-base">Uy-joy, kvartira, mashina, bo'sh ish o'rinlari va boshqa har qanday turdagi eng sara e'lonlar makoni.</p>
 </div>
 
 <!-- Search & Filters -->
-<form method="GET" action="/" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl mb-10 grid grid-cols-1 md:grid-cols-4 gap-4">
-    <input type="text" name="search" value="{{ search }}" placeholder="Qidiruv (masalan: Lacetti, Toshkent...)" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+<form method="GET" action="/" class="bg-white border border-slate-200 p-4 rounded-2xl shadow-lg mb-10 grid grid-cols-1 md:grid-cols-4 gap-4">
+    <input type="text" name="search" value="{{ search }}" placeholder="Qidiruv (masalan: Spark, Toshkent...)" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
     
-    <select name="category" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
-        <option value="">Barcha bo'limlar</option>
-        <option value="Mashina" {% if category == 'Mashina' %}selected{% endif %}>Mashina</option>
-        <option value="Uy-joy / Kvartira" {% if category == 'Uy-joy / Kvartira' %}selected{% endif %}>Uy-joy / Kvartira</option>
-        <option value="Bo'sh ish o'rni" {% if category == "Bo'sh ish o'rni" %}selected{% endif %}>Bo'sh ish o'rni</option>
-        <option value="Boshqa" {% if category == 'Boshqa' %}selected{% endif %}>Boshqa</option>
+    <select name="category" onchange="this.form.submit()" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        <option value="">Barcha kategoriyalar</option>
+        {% for cat in categories.keys() %}
+            <option value="{{ cat }}" {% if selected_cat == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
     </select>
 
-    <select name="region" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500">
+    <select name="subcategory" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        <option value="">Barcha kichik bo'limlar</option>
+        {% for sub in subcategories %}
+            <option value="{{ sub }}" {% if selected_subcat == sub %}selected{% endif %}>{{ sub }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="region" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
         <option value="">Barcha viloyatlar</option>
         <option value="Toshkent sh." {% if region == 'Toshkent sh.' %}selected{% endif %}>Toshkent sh.</option>
         <option value="Toshkent vil." {% if region == 'Toshkent vil.' %}selected{% endif %}>Toshkent vil.</option>
@@ -41,32 +44,38 @@
         <option value="Qoraqalpog'iston" {% if region == "Qoraqalpog'iston" %}selected{% endif %}>Qoraqalpog'iston</option>
     </select>
 
-    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl py-2.5 transition">Qidirish</button>
+    <div class="col-span-full flex gap-4">
+        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl py-2.5 transition shadow-md">Filtrlash va qidirish</button>
+        <a href="/" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition text-center flex items-center justify-center">Tozalash</a>
+    </div>
 </form>
 
 <!-- Ads Grid -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for ad in ads %}
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col justify-between hover:border-slate-700 transition">
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-md flex flex-col justify-between hover:shadow-xl transition">
             <div>
                 <img src="{{ url_for('static', filename='uploads/' + ad['image']) }}" alt="Ad Image" class="w-full h-48 object-cover">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/20">{{ ad['category'] }}</span>
-                        <span class="text-xs text-slate-400">{{ ad['region'] }}</span>
+                        <span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium border border-blue-100">{{ ad['category'] }} / {{ ad['subcategory'] }}</span>
+                        <span class="text-xs text-slate-500">{{ ad['region'] }}</span>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2">{{ ad['title'] }}</h3>
-                    <p class="text-blue-400 font-extrabold text-xl mb-3">{{ ad['price'] }} so'm</p>
-                    <p class="text-slate-300 text-sm mb-4 line-clamp-3">{{ ad['details'] }}</p>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">{{ ad['title'] }}</h3>
+                    <p class="text-blue-600 font-extrabold text-xl mb-1">{{ ad['price'] }} so'm</p>
+                    {% if ad['salary'] %}
+                        <p class="text-emerald-600 font-semibold text-sm mb-2">Oylik maosh: {{ ad['salary'] }}</p>
+                    {% endif %}
+                    <p class="text-slate-600 text-sm mb-4 line-clamp-2">{{ ad['details'] }}</p>
                 </div>
             </div>
-            <div class="p-5 pt-0 border-t border-slate-800/60 mt-auto flex items-center justify-between text-sm">
-                <span class="text-slate-400">Tel: <strong class="text-slate-200">{{ ad['phone'] }}</strong></span>
-                <a href="https://t.me/{{ ad['telegram'].replace('@', '') }}" target="_blank" class="text-blue-400 hover:underline">@{{ ad['telegram'].replace('@', '') }}</a>
+            <div class="p-5 pt-0 border-t border-slate-100 mt-auto flex items-center justify-between text-sm">
+                <span class="text-slate-500">Tel: <strong class="text-slate-800">{{ ad['phone'] }}</strong></span>
+                <a href="{{ url_for('ad_detail', id=ad['id']) }}" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-medium transition shadow-sm">Batafsil ko'rish</a>
             </div>
         </div>
     {% else %}
-        <div class="col-span-full text-center py-16 text-slate-500">
+        <div class="col-span-full text-center py-16 text-slate-400">
             Hozircha tasdiqlangan e'lonlar mavjud emas.
         </div>
     {% endfor %}
