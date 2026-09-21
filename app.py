@@ -11,6 +11,21 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs('static', exist_ok=True)
 
+CATEGORIES = {
+    "Uy-joy": ["Uy", "Kvartira", "Yer", "Ijara", "Tijorat binolari"],
+    "Avtomobil": ["Yengil avtomobil", "Yuk mashinasi", "Moto", "Ehtiyot qismlar", "Avto xizmatlar"],
+    "Ish va vakansiyalar": ["Ish qidiraman", "Ishchi kerak", "Masofaviy ish", "Xizmat ko‘rsatish"],
+    "Elektronika": ["Telefon", "Kompyuter", "Noutbuk", "Televizor", "Aksessuarlar"],
+    "Uy va mebel": ["Mebel", "Maishiy texnika", "Uy jihozlari"],
+    "Kiyim-kechak": ["Erkaklar", "Ayollar", "Bolalar", "Oyoq kiyim"],
+    "Tovarlar": ["Yangi", "Ishlatilgan", "Shaxsiy savdo"],
+    "Xizmatlar": ["Ta’mirlash", "Yetkazib berish", "Usta xizmatlari", "IT xizmatlar", "Boshqa xizmatlar"],
+    "Hayvonlar": ["Uy hayvonlari", "Chorva", "Qushlar"],
+    "Ta’lim": ["Kurslar", "Repetitor", "O‘quv markazlari"],
+    "Hobbi va ko‘ngilochar": ["O‘yinlar", "Sport", "Musiqa", "To‘plamlar"],
+    "Boshqa": ["Boshqa"]
+}
+
 def init_db():
     conn = sqlite3.connect('chanoq.db')
     cursor = conn.cursor()
@@ -27,8 +42,10 @@ def init_db():
             user_id INTEGER,
             title TEXT NOT NULL,
             category TEXT NOT NULL,
+            subcategory TEXT NOT NULL,
             region TEXT NOT NULL,
             price TEXT NOT NULL,
+            salary TEXT,
             details TEXT NOT NULL,
             phone TEXT NOT NULL,
             telegram TEXT NOT NULL,
@@ -46,6 +63,7 @@ init_db()
 @app.route('/')
 def index():
     category = request.args.get('category', '')
+    subcategory = request.args.get('subcategory', '')
     region = request.args.get('region', '')
     search = request.args.get('search', '')
 
@@ -59,6 +77,9 @@ def index():
     if category:
         query += " AND category = ?"
         params.append(category)
+    if subcategory:
+        query += " AND subcategory = ?"
+        params.append(subcategory)
     if region:
         query += " AND region = ?"
         params.append(region)
@@ -70,7 +91,10 @@ def index():
     ads = cursor.fetchall()
     conn.close()
 
-    return render_template('index.html', ads=ads, category=category, region=region, search=search)
+    subcategories = CATEGORIES.get(category, []) if category else []
+
+    return render_template('index.html', ads=ads, categories=CATEGORIES, subcategories=subcategories, 
+                           selected_cat=category, selected_subcat=subcategory, region=region, search=search)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -113,7 +137,7 @@ def register():
             flash("Ro'yxatdan o'tdingiz, endi kiring!", "success")
             return redirect(url_for('login'))
         except:
-            flash("Bu foydalanuvchi nomiband band!", "danger")
+            flash("Bu foydalanuvchi nomi band!", "danger")
     return render_template('register.html')
 
 @app.route('/logout')
@@ -131,8 +155,10 @@ def add_ad():
     if request.method == 'POST':
         title = request.form['title']
         category = request.form['category']
+        subcategory = request.form['subcategory']
         region = request.form['region']
         price = request.form['price']
+        salary = request.form.get('salary', '')
         details = request.form['details']
         phone = request.form['phone']
         telegram = request.form['telegram']
@@ -149,16 +175,16 @@ def add_ad():
             conn = sqlite3.connect('chanoq.db')
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO ads (user_id, title, category, region, price, details, phone, telegram, image, receipt, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Kutilmoqda')
-            ''', (session['user_id'], title, category, region, price, details, phone, telegram, img_name, rec_name))
+                INSERT INTO ads (user_id, title, category, subcategory, region, price, salary, details, phone, telegram, image, receipt, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Kutilmoqda')
+            ''', (session['user_id'], title, category, subcategory, region, price, salary, details, phone, telegram, img_name, rec_name))
             conn.commit()
             conn.close()
 
             flash("E'loningiz adminga yuborildi! Tekshirilgach saytga chiqariladi.", "success")
             return redirect(url_for('index'))
 
-    return render_template('add_ad.html')
+    return render_template('add_ad.html', categories=CATEGORIES)
 
 @app.route('/my-ads')
 def my_ads():
@@ -173,6 +199,53 @@ def my_ads():
     conn.close()
     return render_template('my_ads.html', ads=ads)
 
+@app.route('/edit-ad/<int:id>', methods=['GET', 'POST'])
+def edit_ad(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = sqlite3.connect('chanoq.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM ads WHERE id = ? AND user_id = ?", (id, session['user_id']))
+    ad = cursor.fetchone()
+
+    if not ad:
+        conn.close()
+        flash("E'lon topilmadi yoki sizga tegishli emas.", "danger")
+        return redirect(url_for('my_ads'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        category = request.form['category']
+        subcategory = request.form['subcategory']
+        region = request.form['region']
+        price = request.form['price']
+        salary = request.form.get('salary', '')
+        details = request.form['details']
+        phone = request.form['phone']
+        telegram = request.form['telegram']
+
+        image_file = request.files.get('image')
+        img_name = ad['image']
+
+        if image_file and image_file.filename != '':
+            img_name = secure_filename(image_file.filename)
+            image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], img_name))
+
+        cursor.execute('''
+            UPDATE ads SET title=?, category=?, subcategory=?, region=?, price=?, salary=?, details=?, phone=?, telegram=?, image=?, status='Kutilmoqda'
+            WHERE id = ? AND user_id = ?
+        ''', (title, category, subcategory, region, price, salary, details, phone, telegram, img_name, id, session['user_id']))
+        conn.commit()
+        conn.close()
+
+        flash("E'lon yangilandi va qayta tasdiqlash uchun adminga yuborildi.", "success")
+        return redirect(url_for('my_ads'))
+
+    conn.close()
+    return render_template('edit_ad.html', ad=ad, categories=CATEGORIES)
+
 @app.route('/delete-ad/<int:id>')
 def delete_ad(id):
     if 'user_id' not in session:
@@ -184,6 +257,19 @@ def delete_ad(id):
     conn.close()
     flash("E'lon o'chirildi.", "info")
     return redirect(url_for('my_ads'))
+
+@app.route('/ad/<int:id>')
+def ad_detail(id):
+    conn = sqlite3.connect('chanoq.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM ads WHERE id = ?", (id,))
+    ad = cursor.fetchone()
+    conn.close()
+    if not ad:
+        flash("E'lon topilmadi.", "danger")
+        return redirect(url_for('index'))
+    return render_template('ad_detail.html', ad=ad)
 
 @app.route('/admin-panel')
 def admin_panel():
