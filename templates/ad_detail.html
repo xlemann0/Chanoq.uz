@@ -23,9 +23,21 @@
                 <div class="flex items-center justify-between text-slate-700 font-medium">
                     <span>Telefon: <strong class="text-slate-900">{{ ad['phone'] }}</strong></span>
                 </div>
+                
                 <a href="https://t.me/{{ ad['telegram'].replace('@', '') }}" target="_blank" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl text-center shadow-md transition flex items-center justify-center gap-2">
                     Telegram orqali bog'lanish ({{ ad['telegram'] }})
                 </a>
+
+                <!-- E'lon egasiga sayt ichida xabar yuborish -->
+                {% if session.get('user_id') and session['user_id'] != ad['user_id'] %}
+                <form action="{{ url_for('messages') }}" method="POST" class="mt-2 flex flex-col gap-2">
+                    <input type="hidden" name="receiver_id" value="{{ ad['user_id'] }}">
+                    <textarea name="message" rows="2" placeholder="E'lon egasiga xabar yozing..." required class="border border-slate-300 rounded-xl p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl text-sm transition">
+                        Xabar yuborish
+                    </button>
+                </form>
+                {% endif %}
             </div>
         </div>
     </div>
