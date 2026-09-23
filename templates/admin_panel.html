@@ -1,8 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="mb-8">
-    <h2 class="text-3xl font-black text-slate-900 mb-2">Admin Panel</h2>
-    <p class="text-slate-600">Barcha kelib tushgan e'lonlar va ro'yxatdan o'tgan foydalanuvchilarni boshqarish paneli.</p>
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h2 class="text-3xl font-black text-slate-900 mb-2">Admin Panel</h2>
+        <p class="text-slate-600">Barcha kelib tushgan e'lonlar va ro'yxatdan o'tgan foydalanuvchilarni boshqarish paneli.</p>
+    </div>
+    
+    <!-- Qo'ng'iroqcha va Bildirishnoma tugmasi -->
+    <div class="relative">
+        <a href="{{ url_for('messages') }}" class="relative bg-white border border-slate-200 p-3 rounded-2xl shadow-sm hover:bg-slate-50 transition flex items-center justify-center text-slate-700">
+            <!-- Qo'ng'iroqcha SVG ikonka -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <!-- O'qilmagan xabarlar soni (agar mavjud bo'lsa) -->
+            {% if unread_messages_count and unread_messages_count > 0 %}
+                <span class="absolute -top-1 -right-1 bg-rose-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+                    {{ unread_messages_count }}
+                </span>
+            {% endif %}
+        </a>
+    </div>
 </div>
 
 <div class="space-y-10">
@@ -74,6 +92,7 @@
                     <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 text-sm">
                         <th class="p-4">ID</th>
                         <th class="p-4">Foydalanuvchi nomi</th>
+                        <th class="p-4">Telefon raqami</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-sm">
@@ -81,10 +100,11 @@
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-4 text-slate-500">#{{ user['id'] }}</td>
                             <td class="p-4 font-semibold text-slate-900">{{ user['username'] }}</td>
+                            <td class="p-4 text-slate-700">{{ user['phone'] }}</td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="2" class="p-6 text-center text-slate-400">Foydalanuvchilar yo'q.</td>
+                            <td colspan="3" class="p-6 text-center text-slate-400">Foydalanuvchilar yo'q.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
