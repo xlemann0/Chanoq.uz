@@ -33,7 +33,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            phone TEXT NOT NULL
         )
     ''')
     cursor.execute('''
@@ -53,6 +54,17 @@ def init_db():
             receipt TEXT NOT NULL,
             status TEXT DEFAULT 'Kutilmoqda',
             FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender_id INTEGER,
+            receiver_id INTEGER,
+            message TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(sender_id) REFERENCES users(id),
+            FOREIGN KEY(receiver_id) REFERENCES users(id)
         )
     ''')
     conn.commit()
@@ -128,23 +140,18 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        phone = request.form['phone']
         try:
             conn = sqlite3.connect('chanoq.db')
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+            cursor.execute("INSERT INTO users (username, password, phone) VALUES (?, ?, ?)", (username, password, phone))
             conn.commit()
             conn.close()
             flash("Ro'yxatdan o'tdingiz, endi kiring!", "success")
             return redirect(url_for('login'))
         except:
-            flash("Bu foydalanuvchi nomi band!", "danger")
+            flash("Bu foydalanuvchi nomi band yoki xatolik yuz berdi!", "danger")
     return render_template('register.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash("Tizimdan chiqildi.", "info")
-    return redirect(url_for('index'))
 
 @app.route('/add-ad', methods=['GET', 'POST'])
 def add_ad():
@@ -270,6 +277,33 @@ def ad_detail(id):
         flash("E'lon topilmadi.", "danger")
         return redirect(url_for('index'))
     return render_template('ad_detail.html', ad=ad)
+
+@app.route('/messages', methods=['GET', 'POST'])
+def messages():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect('chanoq.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        receiver_id = request.form['receiver_id']
+        message = request.form['message']
+        cursor.execute("INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)", 
+                       (session['user_id'], receiver_id, message))
+        conn.commit()
+        flash("Xabar yuborildi!", "success")
+        return redirect(url_for('messages'))
+
+    cursor.execute("SELECT * FROM messages WHERE receiver_id = ? OR sender_id = ?", (session['user_id'], session['user_id']))
+    msgs = cursor.fetchall()
+    
+    cursor.execute("SELECT id, username FROM users WHERE id != ?", (session['user_id'],))
+    users = cursor.fetchall()
+    
+    conn.close()
+    return render_template('messages.html', messages=msgs, users=users)
 
 @app.route('/admin-panel')
 def admin_panel():
