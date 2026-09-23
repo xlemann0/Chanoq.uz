@@ -56,7 +56,6 @@ def init_db():
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
-    # Shaxsiy xabarlar va bildirishnomalar uchun
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,7 +68,6 @@ def init_db():
             FOREIGN KEY(receiver_id) REFERENCES users(id)
         )
     ''')
-    # Ommaviy guruh chat uchun jadval
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS group_messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,7 +97,6 @@ def inject_notifications():
     elif session.get('admin'):
         conn = sqlite3.connect('chanoq.db')
         cursor = conn.cursor()
-        # Admin uchun foydalanuvchilardan kelgan va o'qilmagan xabarlar (receiver_id = 0 yoki maxsus admin id)
         cursor.execute("SELECT COUNT(*) FROM messages WHERE receiver_id = 0 AND is_read = 0")
         res = cursor.fetchone()
         if res:
@@ -187,6 +184,12 @@ def register():
         except:
             flash("Bu foydalanuvchi nomi band yoki xatolik yuz berdi!", "danger")
     return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("Tizimdan chiqdingiz.", "info")
+    return redirect(url_for('login'))
 
 @app.route('/add-ad', methods=['GET', 'POST'])
 def add_ad():
@@ -313,7 +316,7 @@ def ad_detail(id):
         return redirect(url_for('index'))
     return render_template('ad_detail.html', ad=ad)
 
-# Foydalanuvchi va Admin o'rtasidagi shaxsiy chat
+# Shaxsiy xabarlar tizimi
 @app.route('/messages', methods=['GET', 'POST'])
 def messages():
     if 'user_id' not in session and not session.get('admin'):
@@ -325,60 +328,29 @@ def messages():
 
     if request.method == 'POST':
         message = request.form['message']
+        receiver_id = request.form.get('receiver_id', 0)
+        
         if session.get('admin'):
-            # Admin javob yuboryapti (receiver_id ni formdan yoki tanlangan userdan oladi)
-            receiver_id = request.form.get('receiver_id')
             cursor.execute("INSERT INTO messages (sender_id, receiver_id, message, is_read) VALUES (0, ?, ?, 0)", (receiver_id, message))
         else:
-            # Foydalanuvchi adminga yozyapti (receiver_id = 0)
-            cursor.execute("INSERT INTO messages (sender_id, receiver_id, message, is_read) VALUES (?, 0, ?, 0)", (session['user_id'], message))
+            cursor.execute("INSERT INTO messages (sender_id, receiver_id, message, is_read) VALUES (?, ?, ?, 0)", (session['user_id'], receiver_id, message))
+        
         conn.commit()
-        flash("Xabar yuborildi!", "success")
-        if session.get('admin'):
-            return redirect(url_for('admin_chats'))
-        return redirect(url_for('messages'))
-
-    if session.get('admin'):
-        # Admin uchun barcha yozishmalar ro'yxati
-        cursor.execute("SELECT DISTINCT users.id, users.username FROM users JOIN messages ON users.id = messages.sender_id OR users.id = messages.receiver_id")
-        chat_users = cursor.fetchall()
         conn.close()
-        return render_template('admin_chats.html', chat_users=chat_users)
-    else:
-        # Foydalanuvchi uchun admin bilan xabarlar
+        flash("Xabar yuborildi!", "success")
+        return redirect(request.referrer or url_for('messages'))
+
+    if 'user_id' in session:
         user_id = session['user_id']
         cursor.execute("SELECT * FROM messages WHERE sender_id = ? OR receiver_id = ? ORDER BY timestamp ASC", (user_id, user_id))
         msgs = cursor.fetchall()
-        # O'qilgan qilish
         cursor.execute("UPDATE messages SET is_read = 1 WHERE receiver_id = ?", (user_id,))
         conn.commit()
         conn.close()
         return render_template('messages.html', messages=msgs)
-
-# Admin uchun ma'lum bir user bilan chat tafsiloti
-@app.route('/admin/chat/<int:user_id>', methods=['GET', 'POST'])
-def admin_chat_detail(user_id):
-    if not session.get('admin'):
-        return redirect(url_for('login'))
-        
-    conn = sqlite3.connect('chanoq.db')
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
     
-    if request.method == 'POST':
-        message = request.form['message']
-        cursor.execute("INSERT INTO messages (sender_id, receiver_id, message, is_read) VALUES (0, ?, ?, 0)", (user_id, message))
-        conn.commit()
-        return redirect(url_for('admin_chat_detail', user_id=user_id))
-        
-    cursor.execute("SELECT * FROM messages WHERE sender_id = ? OR receiver_id = ? ORDER BY timestamp ASC", (user_id, user_id))
-    messages = cursor.fetchall()
-    
-    # Admin kirganda o'qilgan qilish
-    cursor.execute("UPDATE messages SET is_read = 1 WHERE sender_id = ? AND receiver_id = 0", (user_id,))
-    conn.commit()
     conn.close()
-    return render_template('admin_chat_detail.html', messages=messages, user_id=user_id)
+    return redirect(url_for('index'))
 
 # Ommaviy guruh chat (Global Chat)
 @app.route('/group-chat', methods=['GET', 'POST'])
@@ -394,13 +366,11 @@ def group_chat():
     if request.method == 'POST':
         message = request.form.get('message')
         if message:
-            # Kim yozganini aniqlash (User yoki Admin)
-            u_id = session.get('user_id', 0) # Admin uchun 0 yoki maxsus qiymat
+            u_id = session.get('user_id', 0)
             cursor.execute("INSERT INTO group_messages (user_id, message) VALUES (?, ?)", (u_id, message))
             conn.commit()
             return redirect(url_for('group_chat'))
 
-    # Guruhdagi barcha xabarlarni foydalanuvchi nomlari bilan birga olish
     cursor.execute('''
         SELECT gm.*, COALESCE(u.username, 'Admin') as username 
         FROM group_messages gm 
